@@ -2,9 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import type { TriviaCategory, TriviaQuestion, Difficulty } from '@/types/trivia';
 import { triviaApi } from '@/services/triviaApi';
 
-const CATEGORIES_CACHE_KEY = 'trivia_categories_cache';
-const CACHE_DURATION = 1000 * 60 * 30;
-
 export function useTriviaCategories() {
   const [categories, setCategories] = useState<TriviaCategory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -15,22 +12,8 @@ export function useTriviaCategories() {
       setLoading(true);
       setError('');
       
-      const cached = sessionStorage.getItem(CATEGORIES_CACHE_KEY);
-      if (cached) {
-        const { data, timestamp } = JSON.parse(cached);
-        if (Date.now() - timestamp < CACHE_DURATION) {
-          setCategories(data);
-          setLoading(false);
-          return data;
-        }
-      }
-      
       const fetchedCategories = await triviaApi.getCategories();
       setCategories(fetchedCategories);
-      sessionStorage.setItem(CATEGORIES_CACHE_KEY, JSON.stringify({
-        data: fetchedCategories,
-        timestamp: Date.now(),
-      }));
       return fetchedCategories;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load categories';
@@ -68,8 +51,6 @@ export function useTriviaQuestions(
       setLoading(true);
       setError('');
       
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
       const response = await triviaApi.getQuestions(amount, categoryId, difficulty);
       setQuestions(response.results);
       return response.results;
@@ -95,4 +76,6 @@ export function useTriviaQuestions(
     refetch: fetchQuestions,
   };
 }
+
+
 

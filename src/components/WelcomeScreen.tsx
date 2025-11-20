@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import type { Difficulty, GameSettings } from '@/types/trivia';
@@ -19,9 +19,11 @@ export function WelcomeScreen({ onStartGame }: WelcomeScreenProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>('medium');
 
-  if (categories.length > 0 && !selectedCategory) {
-    setSelectedCategory(categories[0].id.toString());
-  }
+  useEffect(() => {
+    if (categories.length > 0 && !selectedCategory) {
+      setSelectedCategory(categories[0].id.toString());
+    }
+  }, [categories, selectedCategory]);
 
   const handleStartGame = () => {
     if (!selectedCategory) return;
